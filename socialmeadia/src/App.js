@@ -7,10 +7,11 @@ import PostPage from "./PostPage";
 import Footer from "./Footer";
 import Home from "./Home";
 import Missing from "./Missing";
+import EditPost from "./EditPost";
 import { useEffect, useState } from 'react';
 import {format} from "date-fns"
 import api from "./api/posts"
-
+import useWindowSize from './Hooks/useWindowSize';
 
 function App() {
   const [posts, setPosts] = useState([]);
@@ -18,7 +19,10 @@ function App() {
   const [searchResults, setSearchResults] = useState([]);
   const [postTitle, setPostTitle] = useState('');
   const [postBody, setPostBody] = useState(''); 
+  const [editTitle, setEditTitle] = useState('');
+  const [editBody, setEditBody] = useState('');
   const navigate = useNavigate();
+  const { width } = useWindowSize();
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -66,14 +70,33 @@ function App() {
     }
    
   }
-  const handleDelete = (id) => {
-    const postsList = posts.filter(post => post.id !== id);
-    setPosts(postsList);
-    navigate('/');
+  const handleEdit = async (id) => {
+    const datetime = format(new Date(), 'MMMM dd, yyyy pp');
+    const updatedPost = { id, title: editTitle, datetime, body: editBody };
+    try {
+      const response = await api.put(`/posts/${id}`, updatedPost);
+      setPosts(posts.map(post=>post.id === id ? {...response.data}:post));
+      setEditTitle('');
+      setEditBody('');
+      navigate('/');
+    } catch (err) {
+      console.log(`Error:${err.message}`);
+    }
+  }
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`posts/${id}`)
+      const postsList = posts.filter(post => post.id !== id);
+      setPosts(postsList);
+      navigate('/');
+    } catch (err) {
+      console.log(`Error:${err.message}`);
+    }
+    
   }
   return (
     <div className="App">
-       <Header  tittle="Social Media"/>
+      <Header tittle="Social Media" width={ width} />
       <Nav
         search={search}
         setSearch={setSearch}
@@ -90,6 +113,7 @@ function App() {
           /> } />
           <Route path=":id" element={<PostPage posts={posts}  handleDelete={handleDelete} />} />
         </Route>
+      <Route path="/edit/:id" element={<EditPost posts={posts} handleEdit={handleEdit} editTitle={editTitle}  editBody={editBody}  setEditBody={setEditBody}  setEditTitle={ setEditTitle } />} />  
       <Route path='about' element={ <About/> } />
       <Route path='*' element={ <Missing/> } />
       </Routes>

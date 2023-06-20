@@ -185,6 +185,10 @@ body {
   color: #fff;
   cursor: pointer;
 }
+.PostPage .editbutton {
+  background-color: blue;
+  margin-right: 5px;
+}
 .statusMsg {
   margin-top: 2rem;
 }
