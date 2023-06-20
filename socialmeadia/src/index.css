@@ -146,7 +146,7 @@ body {
 .newPostForm label {
   margin-top: 1rem;
 }
-.newPostForm input [type="text"],
+.newPostForm input[type="text"],
 .newPostForm textarea {
   font-family: sans-serif;
   width: 100%;
@@ -170,12 +170,12 @@ body {
   cursor: pointer;
 }
 .Missing h2,
-.postpage h2,
+.Postpage h2,
 .Missing p,
-.postpage p {
+.Postpage p {
   margin-bottom: 1rem;
 }
-.postpage button {
+.PostPage button {
   height: 48px;
   min-width: 48px;
   border-radius: 0.25rem;

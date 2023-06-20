@@ -3,8 +3,9 @@ import React from 'react'
 const About = () => {
   return (
     
-    <main>
-        <h1>About</h1>
+    <main className='About'>
+      <h2>About</h2>
+      <p>Hi,I am Akshai.Together lets make education free for everyone in the world</p>
     </main>
   )
 }
