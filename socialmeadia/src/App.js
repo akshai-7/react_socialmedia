@@ -12,6 +12,8 @@ import { useEffect, useState } from 'react';
 import {format} from "date-fns"
 import api from "./api/posts"
 import useWindowSize from './Hooks/useWindowSize';
+import useAxiosFetch from './Hooks/useAxiosFetch';
+import { DataProvider } from './context/DataContext';
 
 function App() {
   const [posts, setPosts] = useState([]);
@@ -23,23 +25,28 @@ function App() {
   const [editBody, setEditBody] = useState('');
   const navigate = useNavigate();
   const { width } = useWindowSize();
+  const { data, fetchError, isLoading } = useAxiosFetch('http://localhost:3500/posts')
+  
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await api.get('/posts')
-        setPosts(response.data);
-      } catch (err) {
-        if (err.response) {
-          console.log(err.response.data);
-          console.log(err.response.status);
-          console.log(err.response.headers);
-        } else {
-          console.log(`Error:${err.message}`);
-        }
-      }
-    }
-    fetchPosts();
-  },[])
+    setPosts(data);
+  },[data])
+  // useEffect(() => {
+  //   const fetchPosts = async () => {
+  //     try {
+  //       const response = await api.get('/posts')
+  //       setPosts(response.data);
+  //     } catch (err) {
+  //       if (err.response) {
+  //         console.log(err.response.data);
+  //         console.log(err.response.status);
+  //         console.log(err.response.headers);
+  //       } else {
+  //         console.log(`Error:${err.message}`);
+  //       }
+  //     }
+  //   }
+  //   fetchPosts();
+  // },[])
 
 
   useEffect(() => {
@@ -96,28 +103,30 @@ function App() {
   }
   return (
     <div className="App">
-      <Header tittle="Social Media" width={ width} />
-      <Nav
-        search={search}
-        setSearch={setSearch}
-      />
-      <Routes>
-        <Route path='/' element={<Home posts={searchResults} />} />
-        <Route path='post'>
-          <Route index element={ <NewPost
-            handleSubmit={handleSubmit}
-            postTitle={postTitle}
-            setPostTitle={setPostTitle}
-            postBody={postBody}
-            setPostBody={setPostBody}
-          /> } />
-          <Route path=":id" element={<PostPage posts={posts}  handleDelete={handleDelete} />} />
-        </Route>
-      <Route path="/edit/:id" element={<EditPost posts={posts} handleEdit={handleEdit} editTitle={editTitle}  editBody={editBody}  setEditBody={setEditBody}  setEditTitle={ setEditTitle } />} />  
-      <Route path='about' element={ <About/> } />
-      <Route path='*' element={ <Missing/> } />
-      </Routes>
-    <Footer/>
+      <DataProvider>
+          <Header tittle="Social Media" width={ width} />
+          <Nav
+            search={search}
+            setSearch={setSearch}
+          />
+          <Routes>
+            <Route path='/' element={<Home posts={searchResults} fetchError={fetchError} isLoading={isLoading} />} />
+            <Route path='post'>
+              <Route index element={ <NewPost
+                handleSubmit={handleSubmit}
+                postTitle={postTitle}
+                setPostTitle={setPostTitle}
+                postBody={postBody}
+                setPostBody={setPostBody}
+              /> } />
+              <Route path=":id" element={<PostPage posts={posts}  handleDelete={handleDelete} />} />
+            </Route>
+          <Route path="/edit/:id" element={<EditPost posts={posts} handleEdit={handleEdit} editTitle={editTitle}  editBody={editBody}  setEditBody={setEditBody}  setEditTitle={ setEditTitle } />} />  
+          <Route path='about' element={ <About/> } />
+          <Route path='*' element={ <Missing/> } />
+          </Routes>
+            <Footer />
+      </DataProvider>
     </div>
   );
 }
